@@ -94,7 +94,7 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Frontend:  http://localhost:5173" -ForegroundColor Cyan
 Write-Host "Backend:   http://localhost:5000" -ForegroundColor Cyan
-Write-Host "API Key:   suriya0306" -ForegroundColor Cyan
+Write-Host "API Key:   sk_track3_987654321" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Press Ctrl+C to stop all servers" -ForegroundColor Yellow
 Write-Host ""

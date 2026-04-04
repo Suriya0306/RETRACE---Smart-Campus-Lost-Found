@@ -130,7 +130,7 @@ Create `.env` file in backend directory:
 ```
 GEMINI_API_KEY=your_gemini_api_key
 REDIS_URL=redis://localhost:6379/0
-API_KEY=suriya0306
+API_KEY=sk_track3_987654321
 FLASK_ENV=development
 ```
 

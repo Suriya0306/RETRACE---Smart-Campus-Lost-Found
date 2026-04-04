@@ -13,8 +13,8 @@ from dotenv import load_dotenv  # type: ignore
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
-_model = genai.GenerativeModel("gemini-1.5-flash")
+# genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
+# _model moved to analyse_transcript for late-binding/mocking
 
 SOP_TEMPLATE = """
 Standard Operating Procedure (SOP) Stages:
@@ -56,9 +56,18 @@ Respond ONLY with a valid JSON object (no markdown) with these exact keys:
 }}
 """
 
+    # Check for Mock Mode
+    if os.getenv("MOCK_AI", "false").lower() == "true":
+        print("MOCK_AI=true: Bypassing Gemini analysis.")
+        raise Exception("Mock Mode Active (MOCK_AI=true)")
+
     try:
+        # Lazy config to avoid errors if key is missing and mock is NOT used
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
         # Use JSON mode for speed and reliability
-        response = _model.generate_content(
+        response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"}
         )

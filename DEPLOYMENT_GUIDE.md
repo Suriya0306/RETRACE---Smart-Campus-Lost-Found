@@ -101,7 +101,7 @@ Render's free tier does not include a managed Redis instance, which is required 
    ```
    GEMINI_API_KEY: your_actual_key
    REDIS_URL: The URL from Step 1
-   API_KEY: suriya0306 (from your API_SPEC.md)
+   API_KEY: sk_track3_987654321 (from your API_SPEC.md)
    FLASK_ENV: production
    ```
 

@@ -4,7 +4,7 @@ This document details the production-ready API for the Call Centre Compliance sy
 
 ## 1. Authentication
 All requests must include a mandatory API Key in the custom header: `x-api-key`.
-- **Header**: `x-api-key: suriya0306`
+- **Header**: `x-api-key: sk_track3_987654321`
 
 ## 2. Endpoints
 

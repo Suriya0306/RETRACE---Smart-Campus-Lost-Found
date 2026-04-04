@@ -2,7 +2,6 @@
 Speech-to-Text transcription using OpenAI Whisper.
 Detects and handles Hindi (Hinglish) and Tamil (Tanglish).
 """
-import whisper
 import tempfile
 import os
 import base64
@@ -12,11 +11,21 @@ from typing import Dict, Any
 # Loaded once at module level to avoid reloading across calls
 _model = None
 
-
 def _get_model():
     global _model
+    
+    # Check for Mock Mode to prevent OOM on Render Free Tier (512MB)
+    if os.getenv("MOCK_AI", "false").lower() == "true":
+        print("MOCK_AI=true: Bypassing Whisper model loading.")
+        return None
+        
     if _model is None:
-        _model = whisper.load_model("tiny")
+        try:
+            import whisper
+            _model = whisper.load_model("tiny")
+        except (ImportError, Exception) as e:
+            print(f"Failed to load Whisper model: {e}")
+            return None
     return _model
 
 
@@ -40,6 +49,9 @@ def transcribe_audio(audio_b64: str, language_hint: str = "Mixed") -> Dict[str, 
     try:
         model = _get_model()
         
+        # If model is None (Mock Mode or load failure), trigger fallback
+        if model is None:
+            raise Exception("Whisper model not available (Mock Mode Active)")
         # Map hint to Whisper ISO codes
         whisper_lang = None
         hint_lower = language_hint.lower()
