@@ -44,7 +44,7 @@
 In Render dashboard, go to **Environment**:
 
 ```
-API_KEY = sk_track3_987654321
+API_KEY = suriya0306
 WHISPER_API_KEY = sk_live_your_key_here
 GEMINI_API_KEY = AIzaSy_your_key_here
 FLASK_ENV = production
@@ -105,7 +105,7 @@ Once live, test with:
 ```bash
 curl -X POST https://your-api.onrender.com/api/call-analytics \
   -H "Content-Type: application/json" \
-  -H "x-api-key: sk_track3_987654321" \
+  -H "x-api-key: suriya0306" \
   -d '{
     "audioBase64": "SUQzBAAAI1NTVUQYPp3gLnBhc2",
     "language": "Tamil",
