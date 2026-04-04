@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: call-analytics-backend
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn wsgi:app --workers 4 --worker-class sync --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: 0
