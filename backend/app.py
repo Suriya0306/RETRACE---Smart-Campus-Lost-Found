@@ -17,8 +17,18 @@ except (ImportError, AttributeError):
     celery = None  # type: ignore
 
 from models import init_db, get_all_calls, get_stats, get_payment_aggregates  # type: ignore
-from tasks.pipeline import process_call  # type: ignore
-from tasks.semantic_search import search_calls  # type: ignore
+
+# Try to import tasks - these may fail if dependencies aren't installed
+try:
+    from tasks.pipeline import process_call  # type: ignore
+    from tasks.semantic_search import search_calls  # type: ignore
+except (ImportError, AttributeError) as e:
+    print(f"Warning: Could not import tasks: {e}")
+    # Create dummy functions that return errors
+    def process_call(*args, **kwargs):  # type: ignore
+        return {"status": "error", "message": "Task pipeline not available"}
+    def search_calls(*args, **kwargs):  # type: ignore
+        return {"status": "error", "message": "Search not available"}
 
 has_redis = False
 try:
@@ -114,8 +124,13 @@ def search():
     results = search_calls(query)
     return jsonify(results)
 
-# Initialise DB on startup
-init_db()
+# ── Initialise DB on startup
+try:
+    init_db()
+except Exception as e:
+    import traceback
+    print(f"Warning: Could not initialize database: {e}")
+    traceback.print_exc()
 
 
 # ─────────────────────────────────────────────
