@@ -4,7 +4,8 @@ import { API } from '@/apiConfig';
 const API_KEY = 'suriya0306';
 
 interface AnalyticsRequest {
-  audioBase64: string;
+  audioBase64?: string;
+  audioUrl?: string;
   language: string;
   audioFormat?: string;
   agent?: string;
@@ -50,18 +51,20 @@ export async function fileToBase64(file: File): Promise<string> {
  * Sends Base64 audio to the backend for processing
  */
 export async function analyzeCall(
-  audioBase64: string,
+  audioBase64: string | null,
   language: string,
   audioFormat: string = 'mp3',
   agentName: string = 'Agent',
-  filename?: string
+  filename?: string,
+  audioUrl?: string
 ): Promise<AnalyticsResponse> {
   const payload: AnalyticsRequest = {
-    audioBase64,
+    audioBase64: audioBase64 || undefined,
+    audioUrl,
     language,
     audioFormat,
     agent: agentName,
-    filename: filename || `capture.${audioFormat}`,
+    filename: filename || (audioUrl ? audioUrl.split('/').pop() : `capture.${audioFormat}`) || 'audio.mp3',
   };
 
   const response = await fetch(`${API}/api/call-analytics`, {
@@ -110,21 +113,7 @@ export async function processAudioUrl(
   language: string,
   agentName: string = 'Agent'
 ): Promise<AnalyticsResponse> {
-  try {
-    const response = await fetch(audioUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch audio: ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const audioBase64 = await fileToBase64(blob as File);
-    const filename = audioUrl.split('/').pop() || 'audio.mp3';
-    const ext = filename.split('.').pop()?.toLowerCase() || 'mp3';
-
-    return analyzeCall(audioBase64, language, ext, agentName, filename);
-  } catch (error) {
-    throw new Error(
-      `Failed to process audio URL: ${error instanceof Error ? error.message : String(error)}`
-    );
-  }
+  // Instead of fetching in the frontend (CORS issues), 
+  // we pass the URL to the backend to download.
+  return analyzeCall(null, language, 'mp3', agentName, undefined, audioUrl);
 }

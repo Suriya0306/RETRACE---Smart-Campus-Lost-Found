@@ -3,6 +3,7 @@ Flask REST API for the Call Centre Analytics system.
 """
 import os
 import base64
+import requests
 from flask import Flask, request, jsonify  # type: ignore
 from flask_cors import CORS  # type: ignore
 from dotenv import load_dotenv  # type: ignore
@@ -88,10 +89,21 @@ def analytics_sync():
     if not data:
         return jsonify({"status": "error", "message": "No data provided"}), 400
     
-    # Support both current "audio_b64" and requested "audioBase64"
+    # Support both current "audio_b64", "audioBase64", and new "audioUrl"
     audio_b64 = data.get("audioBase64") or data.get("audio_b64")
-    if not audio_b64:
-        return jsonify({"status": "error", "message": "audioBase64 or audio_b64 is required"}), 400
+    audio_url = data.get("audioUrl")
+    
+    if not audio_b64 and not audio_url:
+        return jsonify({"status": "error", "message": "audioBase64, audio_b64, or audioUrl is required"}), 400
+
+    # If URL is provided, download and convert to B64 (backend proxy to bypass CORS)
+    if audio_url and not audio_b64:
+        try:
+            resp = requests.get(audio_url, timeout=30)
+            resp.raise_for_status()
+            audio_b64 = base64.b64encode(resp.content).decode('utf-8')
+        except Exception as e:
+            return jsonify({"status": "error", "message": f"Failed to download audio from URL: {str(e)}"}), 400
     
     agent_name = data.get("agent", "Agent")
     filename = data.get("filename", f"capture.{data.get('audioFormat', 'mp3')}")
