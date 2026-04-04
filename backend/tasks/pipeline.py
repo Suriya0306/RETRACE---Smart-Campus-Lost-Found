@@ -19,28 +19,24 @@ from typing import Dict, Any
 from models import insert_call, init_db  # type: ignore
 from tasks.semantic_search import index_transcript  # type: ignore
 
-@celery.task(bind=True, name="tasks.pipeline.process_call")
-def process_call(self, audio_b64: str, agent_name: str = "Agent", filename: str = "", language_hint: str = "Mixed") -> Dict[str, Any]:
+def _process_call_logic(audio_b64: str, agent_name: str = "Agent", filename: str = "", language_hint: str = "Mixed", celery_task=None) -> Dict[str, Any]:
     """
-    Main Celery task:
-      1. Transcribe audio with Whisper
-      2. Analyse transcript with Gemini
-      3. Persist result to SQLite
-    Returns the full call record dict.
+    Core logic for processing a call (transcription, analysis, storage).
+    Can be called directly or from a Celery task.
     """
     init_db()
     
     # Stage 1: Transcription
     u = uuid.uuid4().hex
-    call_id = f"CALL-{datetime.now().strftime('%Y%m%d')}-{u[:6].upper()}"  # type: ignore
+    call_id = f"CALL-{datetime.now().strftime('%Y%m%d')}-{u[:6].upper()}"
 
-    if self and has_celery_app and hasattr(self, 'update_state'):
-        self.update_state(state="PROGRESS", meta={"stage": "transcribing", "call_id": call_id})
+    if celery_task and has_celery_app and hasattr(celery_task, 'update_state'):
+        celery_task.update_state(state="PROGRESS", meta={"stage": "transcribing", "call_id": call_id})
     transcription = transcribe_audio(audio_b64, language_hint)
 
     # Stage 2: AI Analysis
-    if self and has_celery_app and hasattr(self, 'update_state'):
-        self.update_state(state="PROGRESS", meta={"stage": "analysing", "call_id": call_id})
+    if celery_task and has_celery_app and hasattr(celery_task, 'update_state'):
+        celery_task.update_state(state="PROGRESS", meta={"stage": "analysing", "call_id": call_id})
     analysis = analyse_transcript(transcription["transcript"], transcription["language"])
 
     # Format duration
@@ -48,19 +44,18 @@ def process_call(self, audio_b64: str, agent_name: str = "Agent", filename: str 
     duration_str = f"{dur_sec // 60}:{dur_sec % 60:02d}"
 
     # Stage 3: Prepare DB Record (Flat for SQLite)
-    # We map from the analytics/sop_validation nested dicts to existing DB columns
     record = {
         "id": call_id,
         "agent": agent_name,
-        "customer": f"Customer #{u[0:6].upper()}",  # type: ignore
+        "customer": f"Customer #{u[0:6].upper()}",
         "language": transcription["language"],
         "duration": duration_str,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "status": analysis["sop_validation"]["adherenceStatus"].lower(),
-        "sop_score": int(round(float(analysis["sop_validation"]["complianceScore"]), 2) * 100),  # type: ignore
+        "sop_score": int(round(float(analysis["sop_validation"]["complianceScore"]), 2) * 100),
         "greeting": int(analysis["sop_validation"]["greeting"]),
         "id_verify": int(analysis["sop_validation"]["identification"]),
-        "compliance": int(analysis["sop_validation"]["solutionOffering"]),  # Mapping new stage to old col for now
+        "compliance": int(analysis["sop_validation"]["solutionOffering"]),
         "transcript": transcription["transcript"],
         "summary": analysis["summary"],
         "payment_type": analysis["analytics"]["paymentPreference"],
@@ -68,16 +63,27 @@ def process_call(self, audio_b64: str, agent_name: str = "Agent", filename: str 
     }
     insert_call(record)
     
-    # Semantic Search Indexing (Vector Storage)
+    # Semantic Search Indexing
     index_transcript(call_id, transcription["transcript"])
 
-    # Return exactly what the user requested for the API
+    # Return exactly what the UI expects (flat + nested)
     return {
-        "status": "success",
+        "status": analysis["sop_validation"]["adherenceStatus"].lower(),
         "language": transcription["language"],
         "transcript": transcription["transcript"],
         "summary": analysis["summary"],
+        "sop_score": int(round(float(analysis["sop_validation"]["complianceScore"]), 2) * 100),
+        "greeting": bool(analysis["sop_validation"]["greeting"]),
+        "id_verify": bool(analysis["sop_validation"]["identification"]),
+        "compliance": bool(analysis["sop_validation"]["solutionOffering"]),
+        "payment_type": analysis["analytics"]["paymentPreference"],
+        "rejection_reason": analysis["analytics"]["rejectionReason"],
         "sop_validation": analysis["sop_validation"],
         "analytics": analysis["analytics"],
         "keywords": analysis["keywords"]
     }
+
+@celery.task(bind=True, name="tasks.pipeline.process_call")
+def process_call(self, audio_b64: str, agent_name: str = "Agent", filename: str = "", language_hint: str = "Mixed") -> Dict[str, Any]:
+    """Celery task wrapper."""
+    return _process_call_logic(audio_b64, agent_name, filename, language_hint, celery_task=self)

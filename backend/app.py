@@ -20,7 +20,7 @@ from models import init_db, get_all_calls, get_stats, get_payment_aggregates  # 
 
 # Try to import tasks - these may fail if dependencies aren't installed
 try:
-    from tasks.pipeline import process_call  # type: ignore
+    from tasks.pipeline import process_call, _process_call_logic  # type: ignore
     from tasks.semantic_search import search_calls  # type: ignore
 except (ImportError, AttributeError) as e:
     print(f"Warning: Could not import tasks: {e}")
@@ -99,7 +99,7 @@ def analytics_sync():
 
     try:
         # Pass language_hint for Whisper/Gemini context
-        result = process_call(None, audio_b64, agent_name, filename, language_hint)
+        result = _process_call_logic(audio_b64, agent_name, filename, language_hint)
         return jsonify(result)
     except Exception as e:
         import traceback
@@ -191,7 +191,7 @@ def upload_call():
         
         def run_sync():
             try:
-                result = process_call(audio_b64, agent_name, filename)
+                result = _process_call_logic(audio_b64, agent_name, filename)
                 _sync_tasks[task_id] = {"status": "done", "result": result}
             except Exception as e:
                 _sync_tasks[task_id] = {"status": "error", "error": str(e)}

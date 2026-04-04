@@ -1,7 +1,7 @@
 import { API } from '@/apiConfig';
 
 // API Key for backend authentication
-const API_KEY = 'sk_track3_987654321';
+const API_KEY = 'suriya0306';
 
 interface AnalyticsRequest {
   audioBase64: string;
