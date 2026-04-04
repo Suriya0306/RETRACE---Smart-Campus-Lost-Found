@@ -1,12 +1,12 @@
-import { Navigation } from '@/components/Navigation';
-import { PageOverlay } from '@/components/PageOverlay';
-import { DashboardHero } from '@/sections/DashboardHero';
-import { UploadCall } from '@/sections/UploadCall';
-import { Analytics } from '@/sections/Analytics';
-import { CallRecords } from '@/sections/CallRecords';
-import { PaymentPreferences } from '@/sections/PaymentPreferences';
-import { ComplianceOverview } from '@/sections/ComplianceOverview';
-import { usePageLoad } from '@/hooks/usePageLoad';
+import { Navigation } from './components/Navigation';
+import { PageOverlay } from './components/PageOverlay';
+import { DashboardHero } from './sections/DashboardHero';
+import { UploadCall } from './sections/UploadCall';
+import { Analytics } from './sections/Analytics';
+import { CallRecords } from './sections/CallRecords';
+import { PaymentPreferences } from './sections/PaymentPreferences';
+import { ComplianceOverview } from './sections/ComplianceOverview';
+import { usePageLoad } from './hooks/usePageLoad';
 
 function App() {
   const { showOverlay } = usePageLoad(500);

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Upload, Mic, CheckCircle, AlertCircle, Loader2, FileAudio, X } from 'lucide-react';
-import { processAudioFile, processAudioUrl } from '@/services/analyticsApi';
+import { processAudioFile, processAudioUrl } from '../services/analyticsApi';
 
 type Stage = 'idle' | 'uploading' | 'transcribing' | 'analysing' | 'done' | 'error';
 
