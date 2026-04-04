@@ -16,12 +16,12 @@ except (ImportError, AttributeError):
     AsyncResult = None  # type: ignore
     celery = None  # type: ignore
 
-from models import init_db, get_all_calls, get_stats, get_payment_aggregates  # type: ignore
+from .models import init_db, get_all_calls, get_stats, get_payment_aggregates  # type: ignore
 
 # Try to import tasks - these may fail if dependencies aren't installed
 try:
-    from tasks.pipeline import process_call  # type: ignore
-    from tasks.semantic_search import search_calls  # type: ignore
+    from .tasks.pipeline import process_call  # type: ignore
+    from .tasks.semantic_search import search_calls  # type: ignore
 except (ImportError, AttributeError) as e:
     print(f"Warning: Could not import tasks: {e}")
     # Create dummy functions that return errors

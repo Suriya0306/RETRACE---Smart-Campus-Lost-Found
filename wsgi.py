@@ -1,25 +1,17 @@
 """
-WSGI entry point for Gunicorn
-This allows Gunicorn to properly import and run the Flask app
+WSGI entry point for Gunicorn on Render
 """
 import sys
 import os
 
-# Add current directory and backend to path
+# Add backend directory to Python path
+backend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backend')
+sys.path.insert(0, backend_path)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backend'))
 
-# Now import the app
-try:
-    # Try importing from backend module
-    from app import app
-except ImportError:
-    # Fallback - try absolute import
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("app", os.path.join(os.path.dirname(__file__), "backend", "app.py"))
-    app_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(app_module)
-    app = app_module.app
+# Import the Flask app from backend/app.py
+from backend.app import app
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
