@@ -129,15 +129,19 @@ git branch -M main
 Write-Success "Branch renamed to: main"
 
 # Add remote
-$existingRemote = git remote get-url origin 2>$null
-if ($LASTEXITCODE -eq 0 -and $existingRemote -eq $GitHubURL) {
-    Write-Info "Remote already configured correctly"
-}
-else {
-    if ($LASTEXITCODE -eq 0) {
+try {
+    $existingRemote = git remote get-url origin 2>$null
+    if ($existingRemote -eq $GitHubURL) {
+        Write-Info "Remote already configured correctly"
+    }
+    else {
         git remote remove origin
         Write-Info "Removed existing remote"
+        git remote add origin $GitHubURL
+        Write-Success "Remote repository added: $GitHubURL"
     }
+}
+catch {
     git remote add origin $GitHubURL
     Write-Success "Remote repository added: $GitHubURL"
 }
