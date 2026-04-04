@@ -35,7 +35,17 @@ _sync_tasks = {}
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="../frontend/dist", static_url_path="/")
+# Get absolute path to frontend dist folder
+import sys
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(backend_dir)
+dist_folder = os.path.join(project_root, "frontend", "dist")
+
+# For development: use relative path; for production: use absolute path
+if not os.path.exists(dist_folder):
+    dist_folder = os.path.join(os.getcwd(), "frontend", "dist")
+
+app = Flask(__name__, static_folder=dist_folder, static_url_path="/")
 # Allow all origins for production deployment (secured by API key)
 CORS(app, 
      allow_origins=["*"],
