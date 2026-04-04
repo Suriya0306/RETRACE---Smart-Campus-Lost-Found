@@ -23,7 +23,21 @@ When you attempted to upload a file, the browser reported a **CORS error**. Howe
 
 ---
 
-## 3. The Solution: `MOCK_AI` Logic
+## 4. Environment Variable "Key Map"
+Here is exactly what each variable does and whether you need to keep it:
+
+| Variable | Required? | Why? |
+| :--- | :--- | :--- |
+| **`API_KEY`** | **YES** | **Mandatory.** Protects your API from unauthorized access. Must be `suriya0306`. |
+| **`MOCK_AI`** | **YES** | **Mandatory for Render Free.** Prevents the 512MB RAM crash/502 error. |
+| **`GEMINI_API_KEY`** | *Optional* | Only used for real AI analysis. Safe to keep, but not used in "Mock Mode". |
+| **`REDIS_URL`** | *Optional* | Only used for background task queuing. The site works without it. |
+
+**Recommendation:** Keep all of them! It shows your project is "fully configured" even if you are using Mock Mode for the demo stability.
+
+---
+
+## 5. The Solution: `MOCK_AI` Logic
 To ensure the app is stable for limited environments (like Render Free Tier), we use a `MOCK_AI` flag.
 
 ### How it works:

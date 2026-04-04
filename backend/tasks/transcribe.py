@@ -49,9 +49,13 @@ def transcribe_audio(audio_b64: str, language_hint: str = "Mixed") -> Dict[str, 
     try:
         model = _get_model()
         
-        # If model is None (Mock Mode or load failure), trigger fallback
+        # Check for Mock Mode here instead of raising
+        if os.getenv("MOCK_AI", "false").lower() == "true":
+            raise Exception("Mock Mode Active (MOCK_AI=true)")
+        
+        # If model is None (load failure), trigger fallback
         if model is None:
-            raise Exception("Whisper model not available (Mock Mode Active)")
+            raise Exception("Whisper model not available")
         # Map hint to Whisper ISO codes
         whisper_lang = None
         hint_lower = language_hint.lower()

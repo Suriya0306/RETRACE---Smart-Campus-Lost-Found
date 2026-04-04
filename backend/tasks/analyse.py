@@ -56,12 +56,11 @@ Respond ONLY with a valid JSON object (no markdown) with these exact keys:
 }}
 """
 
-    # Check for Mock Mode
-    if os.getenv("MOCK_AI", "false").lower() == "true":
-        print("MOCK_AI=true: Bypassing Gemini analysis.")
-        raise Exception("Mock Mode Active (MOCK_AI=true)")
-
     try:
+        # Check for Mock Mode inside the try block
+        if os.getenv("MOCK_AI", "false").lower() == "true":
+            raise Exception("Mock Mode Active (MOCK_AI=true)")
+            
         # Lazy config to avoid errors if key is missing and mock is NOT used
         genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
         model = genai.GenerativeModel("gemini-1.5-flash")
