@@ -1,14 +1,12 @@
 {
   "name": "call-analytics-frontend",
   "version": "1.0.0",
-  "description": "Call Center Analytics Dashboard - Frontend",
   "buildCommand": "npm run build",
   "outputDirectory": "./dist",
   "framework": "vite",
   "env": [
     {
       "key": "VITE_API_URL",
-      "description": "Backend API URL (e.g., https://api.render.com)",
       "type": "string"
     }
   ],

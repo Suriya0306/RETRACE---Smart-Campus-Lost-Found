@@ -4,13 +4,11 @@
 export interface SiteConfig {
   language: string;
   title: string;
-  description: string;
 }
 
 export const siteConfig: SiteConfig = {
   language: "",
   title: "",
-  description: "",
 };
 
 // Navigation configuration
@@ -59,7 +57,6 @@ export interface AboutImage {
 
 export interface AboutConfig {
   label: string;
-  description: string;
   experienceValue: string;
   experienceLabel: string;
   stats: AboutStat[];
@@ -68,7 +65,6 @@ export interface AboutConfig {
 
 export const aboutConfig: AboutConfig = {
   label: "",
-  description: "",
   experienceValue: "",
   experienceLabel: "",
   stats: [],
@@ -79,7 +75,6 @@ export const aboutConfig: AboutConfig = {
 export interface ServiceItem {
   iconName: string;
   title: string;
-  description: string;
   image: string;
 }
 
@@ -114,7 +109,6 @@ export interface PortfolioCTA {
 export interface PortfolioConfig {
   label: string;
   heading: string;
-  description: string;
   projects: ProjectItem[];
   cta: PortfolioCTA;
   viewAllLabel: string;
@@ -123,7 +117,6 @@ export interface PortfolioConfig {
 export const portfolioConfig: PortfolioConfig = {
   label: "",
   heading: "",
-  description: "",
   projects: [],
   cta: {
     label: "",
@@ -160,7 +153,6 @@ export const testimonialsConfig: TestimonialsConfig = {
 export interface CTAConfig {
   tags: string[];
   heading: string;
-  description: string;
   buttonText: string;
   buttonHref: string;
   email: string;
@@ -170,7 +162,6 @@ export interface CTAConfig {
 export const ctaConfig: CTAConfig = {
   tags: [],
   heading: "",
-  description: "",
   buttonText: "",
   buttonHref: "",
   email: "",
@@ -191,11 +182,9 @@ export interface SocialLink {
 
 export interface FooterConfig {
   logo: string;
-  description: string;
   columns: FooterLinkColumn[];
   socialLinks: SocialLink[];
   newsletterHeading: string;
-  newsletterDescription: string;
   newsletterButtonText: string;
   newsletterPlaceholder: string;
   copyright: string;
@@ -204,11 +193,9 @@ export interface FooterConfig {
 
 export const footerConfig: FooterConfig = {
   logo: "",
-  description: "",
   columns: [],
   socialLinks: [],
   newsletterHeading: "",
-  newsletterDescription: "",
   newsletterButtonText: "",
   newsletterPlaceholder: "",
   copyright: "",
