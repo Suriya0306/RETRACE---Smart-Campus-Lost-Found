@@ -1,18 +1,5 @@
 {
-  "name": "call-analytics-frontend",
-  "version": "1.0.0",
   "buildCommand": "npm run build",
   "outputDirectory": "./dist",
-  "framework": "vite",
-  "env": [
-    {
-      "key": "VITE_API_URL",
-      "type": "string"
-    }
-  ],
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "framework": "vite"
 }
