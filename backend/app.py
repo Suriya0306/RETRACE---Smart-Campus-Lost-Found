@@ -63,7 +63,7 @@ CORS(app,
 )
 
 # ── Authentication ──────────────────────────────────
-API_KEY = os.getenv("API_KEY", "sk_track3_987654321")
+API_KEY = os.getenv("API_KEY", "suriya0306")
 
 def require_api_key(f):  # type: ignore
     from functools import wraps

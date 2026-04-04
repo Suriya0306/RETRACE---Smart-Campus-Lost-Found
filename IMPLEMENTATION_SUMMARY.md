@@ -108,7 +108,7 @@ POST /api/call-analytics
 
 Header:
   Content-Type: application/json
-  x-api-key: sk_track3_987654321
+  x-api-key: suriya0306
 
 Body:
 {
@@ -197,7 +197,7 @@ All tests passed:
 ### Render Backend (5 min setup)
 ```bash
 # Environment Variables needed:
-API_KEY=sk_track3_987654321
+API_KEY=suriya0306
 WHISPER_API_KEY=<your_key>
 GEMINI_API_KEY=<your_key>
 
