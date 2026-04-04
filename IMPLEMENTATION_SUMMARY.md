@@ -198,8 +198,9 @@ All tests passed:
 ```bash
 # Environment Variables needed:
 API_KEY=suriya0306
-WHISPER_API_KEY=<your_key>
-GEMINI_API_KEY=<your_key>
+WHISPER_API_KEY=sk_dummy_not_needed_for_mock
+GEMINI_API_KEY=AIzaSyCVvV3oopAgpx12eNcOgaK044SLu_V9uE4
+REDIS_URL=redis://default:3wCW2luvuF7Te7VSX7wzNY5tpMDhjn48@redis-16902.c330.asia-south1-1.gce.cloud.redislabs.com:16902
 
 # Build: pip install -r requirements.txt
 # Start: python app.py
