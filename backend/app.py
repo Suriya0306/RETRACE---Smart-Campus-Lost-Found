@@ -3,7 +3,7 @@ Flask REST API for the Call Centre Analytics system.
 """
 import os
 import base64
-from flask import Flask, request, jsonify, send_from_directory  # type: ignore
+from flask import Flask, request, jsonify  # type: ignore
 from flask_cors import CORS  # type: ignore
 from dotenv import load_dotenv  # type: ignore
 
@@ -49,13 +49,10 @@ load_dotenv()
 import sys
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(backend_dir)
-dist_folder = os.path.join(project_root, "frontend", "dist")
 
-# For development: use relative path; for production: use absolute path
-if not os.path.exists(dist_folder):
-    dist_folder = os.path.join(os.getcwd(), "frontend", "dist")
-
-app = Flask(__name__, static_folder=dist_folder, static_url_path="/")
+# For production on Render: backend only serves API, not frontend
+# Frontend is on Vercel separately
+app = Flask(__name__)
 # Allow all origins for production deployment (secured by API key)
 CORS(app, 
      allow_origins=["*"],
@@ -279,22 +276,7 @@ def payments():
 # ─────────────────────────────────────────────
 @app.route("/api/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok"})
-
-
-# ─────────────────────────────────────────────
-# Catch-all route for serving React app (MUST BE LAST)
-# ─────────────────────────────────────────────
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):  # type: ignore
-    # Try serving static files from dist first
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    # If not found or root, serve index.html (React handles routing)
-    if not path.startswith("api/"):
-        return send_from_directory(app.static_folder, 'index.html')
-    return jsonify({"error": "API route not found"}), 404
+    return jsonify({"status": "ok", "message": "Backend API is running"})
 
 
 if __name__ == "__main__":
