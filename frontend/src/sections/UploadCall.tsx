@@ -203,7 +203,7 @@ export function UploadCall() {
               <div className="mt-5 space-y-2">
                 {(['uploading', 'transcribing', 'analysing', 'done'] as Stage[]).map((s, i) => {
                   const stages: Stage[] = ['uploading', 'transcribing', 'analysing', 'done'];
-                  const currentIdx = stages.indexOf(stage === 'error' ? 'done' : stage);
+                  const currentIdx = stages.indexOf(stage);
                   const stepIdx = i;
                   const done = stepIdx < currentIdx || (stage === 'done' && currentIdx >= 3);
                   const active = stepIdx === currentIdx && stage !== 'done' && stage !== 'error';
