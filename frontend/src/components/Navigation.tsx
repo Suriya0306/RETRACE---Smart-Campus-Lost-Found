@@ -1,5 +1,5 @@
 import { useState, useEffect, type MouseEvent } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 import { BarChart3, Phone, CreditCard, Shield, Menu, X } from 'lucide-react';
 
 const navLinks = [
