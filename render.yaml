@@ -3,7 +3,7 @@ services:
     name: call-analytics-backend
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: python -m gunicorn backend.app:app --workers 4 --worker-class sync --bind 0.0.0.0:$PORT --timeout 120
+    startCommand: python -m gunicorn wsgi:app --workers 4 --worker-class sync --bind 0.0.0.0:$PORT --timeout 120
     envVars:
       - key: FLASK_ENV
         value: production
