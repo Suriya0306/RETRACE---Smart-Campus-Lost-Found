@@ -237,12 +237,10 @@ git clone https://github.com/Suriya0306/RETRACE---Smart-Campus-Lost-Found.git
 cd RETRACE---Smart-Campus-Lost-Found/app
 
 # 2. Install Backend Dependencies
-cd backend
-npm install
+cd backend && npm install
 
 # 3. Install Frontend Dependencies
-cd ../frontend
-npm install
+cd ../frontend && npm install
 
 # 4. Launch Local Development Environment
 cd ../backend && npm start
@@ -281,184 +279,70 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS & Base64 JSON payload handling (10MB limit)
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Health Check Endpoint
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'retrace-backend' }));
 
-// Start Server & Initialize Database
 initDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`[RETRACE API] Server running on http://localhost:${PORT}`);
-  });
-}).catch(err => {
-  console.error('[RETRACE DB ERROR]', err);
+  app.listen(PORT, () => console.log(`[RETRACE API] Server running on http://localhost:${PORT}`));
 });
 ```
 
 ### 9.2 Transparent 100-Point Matching Algorithm Implementation
 ```javascript
-// Helper: Calculate transparent score match between Lost item + Journey vs Found item
 function calculateMatchScore(lostItem, journeyPoints, foundItem) {
-  let categoryScore = 0;
-  let locationScore = 0;
-  let dateScore = 0;
-  let timeScore = 0;
-  let descriptionScore = 0;
+  let categoryScore = 0, locationScore = 0, dateScore = 0, timeScore = 0, descriptionScore = 0;
 
   // 1. Category Match (25 Points)
   if (lostItem.category && foundItem.category &&
       lostItem.category.toLowerCase() === foundItem.category.toLowerCase()) {
     categoryScore = 25;
-  } else if (lostItem.category && foundItem.category &&
-            (lostItem.category.toLowerCase().includes(foundItem.category.toLowerCase()) ||
-             foundItem.category.toLowerCase().includes(lostItem.category.toLowerCase()))) {
-    categoryScore = 15;
   }
 
   // 2. Location Match (30 Points)
   const journeyLocations = (journeyPoints || []).map(p => p.location.toLowerCase());
   const foundLoc = (foundItem.location || '').toLowerCase();
-  const lostLoc = (lostItem.location || '').toLowerCase();
-
-  if (foundLoc && journeyLocations.includes(foundLoc)) {
-    locationScore = 30;
-  } else if (foundLoc && lostLoc && foundLoc === lostLoc) {
-    locationScore = 30;
-  } else if (foundLoc && journeyLocations.some(l => l.includes(foundLoc) || foundLoc.includes(l))) {
-    locationScore = 20;
-  }
+  if (foundLoc && journeyLocations.includes(foundLoc)) locationScore = 30;
 
   // 3. Date Proximity Match (15 Points)
-  if (lostItem.date && foundItem.date) {
-    if (lostItem.date === foundItem.date) {
-      dateScore = 15;
-    } else {
-      const d1 = new Date(lostItem.date);
-      const d2 = new Date(foundItem.date);
-      const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
-      if (diffDays <= 1) dateScore = 10;
-      else if (diffDays <= 3) dateScore = 5;
-    }
-  }
+  if (lostItem.date === foundItem.date) dateScore = 15;
 
   // 4. Time Window Match (15 Points)
-  if (lostItem.time && foundItem.time) {
-    const t1 = lostItem.time.toLowerCase();
-    const t2 = foundItem.time.toLowerCase();
-    if (t1 === t2) timeScore = 15;
-    else timeScore = 10;
-  } else {
-    timeScore = 8;
-  }
+  if (lostItem.time === foundItem.time) timeScore = 15;
 
   // 5. Description Token Keyword Overlap Match (15 Points)
-  const lostTokens = `${lostItem.name || ''} ${lostItem.color || ''} ${lostItem.brand || ''} ${lostItem.description || ''}`
-    .toLowerCase().split(/\W+/).filter(w => w.length > 2);
-  const foundText = `${foundItem.name || ''} ${foundItem.color || ''} ${foundItem.brand || ''} ${foundItem.description || ''}`
-    .toLowerCase();
-
+  const lostTokens = `${lostItem.name || ''} ${lostItem.description || ''}`.toLowerCase().split(/\W+/).filter(w => w.length > 2);
+  const foundText = `${foundItem.name || ''} ${foundItem.description || ''}`.toLowerCase();
   let matchCount = 0;
-  lostTokens.forEach(token => {
-    if (foundText.includes(token)) matchCount++;
-  });
+  lostTokens.forEach(t => { if (foundText.includes(t)) matchCount++; });
+  if (lostTokens.length > 0 && matchCount / lostTokens.length >= 0.5) descriptionScore = 15;
 
-  if (lostTokens.length > 0) {
-    const ratio = matchCount / lostTokens.length;
-    if (ratio >= 0.5) descriptionScore = 15;
-    else if (ratio >= 0.25) descriptionScore = 10;
-    else if (matchCount >= 1) descriptionScore = 5;
-  }
-
-  const totalScore = categoryScore + locationScore + dateScore + timeScore + descriptionScore;
-  return {
-    score: totalScore,
-    categoryScore,
-    locationScore,
-    dateScore,
-    timeScore,
-    descriptionScore
-  };
+  return { score: categoryScore + locationScore + dateScore + timeScore + descriptionScore };
 }
 ```
 
-### 9.3 Retrace Journey & Loss Zone Analysis Endpoint (`POST /api/retrace`)
-```javascript
-// POST /api/retrace - Flagship Journey Analyzer & Smart Matching Engine
-app.post('/api/retrace', (req, res) => {
-  const { lostItem, journeyPoints } = req.body;
+---
 
-  if (!lostItem || !journeyPoints || !Array.isArray(journeyPoints)) {
-    return res.status(400).json({ success: false, message: 'Invalid payload: lostItem and journeyPoints required.' });
-  }
+## 10. System Visual Screenshots & UI Previews
 
-  // Calculate Loss Zone Probabilities across journey sequence
-  const totalPoints = journeyPoints.length;
-  const lossZones = journeyPoints.map((point, index) => {
-    const sequenceFactor = 0.5 + ((index + 1) / Math.max(totalPoints, 1)) * 0.5;
-    let confidence = Math.round(sequenceFactor * 85);
-    
-    if (point.location.toLowerCase().includes('cse block')) confidence = 91;
-    else if (point.location.toLowerCase().includes('library')) confidence = 74;
-    else if (point.location.toLowerCase().includes('canteen')) confidence = 52;
+Below are visual screenshots illustrating the live system interface, dashboard metrics, and journey retrace engine.
 
-    return { location: point.location, confidence };
-  });
+### 10.1 Platform Main Dashboard Interface
+![RETRACE Dashboard Screenshot](docs/images/dashboard_screenshot.jpg)
+*Figure 10.1: RETRACE Main Smart Campus Dashboard displaying real-time recovery statistics, instant search bar, category filters, and active lost/found inventory cards.*
 
-  // Query found inventory from SQLite database & run matching score
-  db.all("SELECT * FROM items WHERE type = 'found' AND status = 'active'", [], (err, foundItems) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
+---
 
-    const matches = foundItems.map(found => {
-      const scoring = calculateMatchScore(lostItem, journeyPoints, found);
-      return { foundItem: found, matchScore: scoring.score, breakdown: scoring };
-    }).sort((a, b) => b.matchScore - a.matchScore);
+### 10.2 Campus Journey Retrace Engine & Loss Zone Analysis
+![Retrace Engine Screenshot](docs/images/retrace_journey_screenshot.jpg)
+*Figure 10.2: Campus Journey Retrace Engine showing sequential movement timeline (Hostel → Canteen → CSE Block) with loss zone probability confidence scores (91%, 74%, 52%).*
 
-    res.json({ success: true, lossZones, matches });
-  });
-});
-```
+---
 
-### 9.4 Frontend Image Upload & Base64 Encoder Component
-```tsx
-import React, { useState } from 'react';
-import { Upload, Image as ImageIcon } from 'lucide-react';
-
-export const ImageUploader: React.FC<{ onImageChange: (base64: string) => void }> = ({ onImageChange }) => {
-  const [preview, setPreview] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setPreview(base64String);
-        onImageChange(base64String);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-    <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center hover:border-indigo-500 transition-colors">
-      {preview ? (
-        <div className="relative inline-block">
-          <img src={preview} alt="Item Preview" className="h-40 rounded-lg object-cover shadow-md" />
-        </div>
-      ) : (
-        <label className="cursor-pointer flex flex-col items-center">
-          <Upload className="w-10 h-10 text-indigo-500 mb-2" />
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Click to upload image</span>
-          <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-        </label>
-      )}
-    </div>
-  );
-};
-```
+### 10.3 Live System Interface Screenshot
+![Live System Interface Screenshot](docs/images/app_screenshot.png)
+*Figure 10.3: Live production user interface preview of RETRACE Smart Campus Lost & Found System.*
 
 ---
 
