@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Upload, Image as ImageIcon, X } from 'lucide-react';
 import { api } from '../services/api';
 
 interface ReportFoundPageProps {
@@ -230,14 +230,74 @@ export const ReportFoundPage: React.FC<ReportFoundPageProps> = ({ setCurrentPage
             </div>
           </div>
 
-          {/* Section 3: Finder Details */}
+          {/* Section 3: Image Upload & Finder Details */}
           <div className="space-y-4">
             <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100 flex items-center gap-2">
               <span className="w-6 h-6 rounded-md bg-teal-100 text-teal-700 text-xs flex items-center justify-center">3</span>
-              Finder Contact Details
+              Image Upload & Finder Contact
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Image File Upload Component */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Upload Found Item Photo</label>
+              <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border border-dashed border-slate-300 rounded-2xl bg-slate-50/50">
+                {formData.image ? (
+                  <div className="relative w-28 h-28 rounded-xl overflow-hidden bg-slate-200 flex-shrink-0 group shadow-sm">
+                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, image: '' })}
+                      className="absolute top-1.5 right-1.5 bg-slate-900/80 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                      title="Remove Image"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-28 h-28 rounded-xl border border-slate-200 bg-white flex flex-col items-center justify-center text-slate-400 text-xs flex-shrink-0">
+                    <ImageIcon className="w-8 h-8 mb-1 text-slate-300" />
+                    <span>No image</span>
+                  </div>
+                )}
+
+                <div className="space-y-2 text-xs flex-1 w-full">
+                  <div>
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs border border-teal-200 cursor-pointer transition-colors">
+                      <Upload className="w-4 h-4 text-teal-600" />
+                      <span>Choose Image File...</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setFormData({ ...formData, image: reader.result as string });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-semibold">Or enter image URL:</span>
+                    <input
+                      type="text"
+                      placeholder="https://images.unsplash.com/..."
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      className="w-full p-2 rounded-lg border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-teal-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Finder Name / Staff Title</label>
                 <input
