@@ -1,20 +1,20 @@
 @echo off
-title Call Analytics - Auto-Launcher
+title RETRACE - Smart Campus Lost & Found Launcher
 echo ========================================
-echo Starting Call Analytics Dashboard
+echo Starting RETRACE Smart Campus Web App
 echo ========================================
 
-:: Start Backend in a new window
-echo [1/2] Launching Backend...
-start cmd /k "cd backend && venv\Scripts\python.exe app.py"
+:: Start Backend Server
+echo [1/2] Launching Node.js Express Backend (Port 5000)...
+start cmd /k "cd backend && npm start"
 
-:: Start Frontend in a new window
-echo [2/2] Launching Frontend...
+:: Start Frontend Server
+echo [2/2] Launching React Vite Frontend (Port 5173)...
 start cmd /k "cd frontend && npm run dev"
 
 echo ========================================
-echo Dashboard is starting!
+echo RETRACE Application is starting!
 echo Frontend: http://localhost:5173
-echo Backend:  http://localhost:5000
+echo Backend:  http://localhost:5000/api/items
 echo ========================================
 pause
