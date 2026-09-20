@@ -1,5 +1,5 @@
 # RETRACE Launcher
-Set-Location "c:\Users\nsuri\OneDrive\Desktop\antigravity\guvi web design\app"
+Set-Location $PSScriptRoot
 
 Write-Host "Launching RETRACE Backend on Port 5000..." -ForegroundColor Cyan
 Start-Process cmd -ArgumentList "/k cd backend && npm start"
