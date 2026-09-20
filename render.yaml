@@ -1,11 +1,25 @@
 services:
+  # RETRACE Node.js Express API Backend
   - type: web
-    name: call-analytics-backend
-    runtime: python
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: python -m gunicorn wsgi:app --workers 4 --worker-class sync --bind 0.0.0.0:$PORT --timeout 120
+    name: retrace-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
-      - key: FLASK_ENV
+      - key: NODE_ENV
         value: production
-      - key: FLASK_DEBUG
-        value: 0
+      - key: PORT
+        value: 10000
+
+  # RETRACE React TypeScript Frontend
+  - type: web
+    name: retrace-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
