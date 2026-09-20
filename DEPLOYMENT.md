@@ -1,30 +1,39 @@
-# 🚀 RETRACE Auto-Deployment Guide
+# 🚀 RETRACE Multi-Platform Deployment Guide
 
-RETRACE is configured for zero-config **Auto-Deployment** on major cloud hosting platforms:
-
----
-
-## 1. Render Auto-Deployment (Recommended Full-Stack)
-
-1. Go to **[Render.com](https://render.com)** and sign in with your GitHub account.
-2. Click **New +** → **Blueprint**.
-3. Connect your repository: `Suriya0306/RETRACE---Smart-Campus-Lost-Found`.
-4. Render will detect `render.yaml` and automatically deploy both:
-   - **`retrace-backend`**: Node.js Express REST API
-   - **`retrace-frontend`**: React Production Static Site
-5. **Auto-Deploy**: Every future push to the `main` branch will automatically trigger a rebuild and deploy!
+RETRACE is configured with zero-config deployment manifests for **Render**, **Vercel**, **Netlify**, and **GitHub Pages**.
 
 ---
 
-## 2. Vercel Auto-Deployment (Frontend)
+## 1. Vercel Deployment (Instant Frontend URL)
 
-1. Go to **[Vercel.com](https://vercel.com)** and import repository `Suriya0306/RETRACE---Smart-Campus-Lost-Found`.
-2. Select Root Directory: `frontend`.
-3. Vercel automatically detects Vite + React (`vercel.json` included).
-4. Click **Deploy**.
+- **1-Click Import Link**: [https://vercel.com/new/clone?repository-url=https://github.com/Suriya0306/RETRACE---Smart-Campus-Lost-Found](https://vercel.com/new/clone?repository-url=https://github.com/Suriya0306/RETRACE---Smart-Campus-Lost-Found)
+- **Configuration**: Managed automatically via `vercel.json` and `frontend/vercel.json`.
+- **Build Command**: `cd frontend && npm install && npm run build`
+- **Publish Directory**: `frontend/dist`
 
 ---
 
-## 3. GitHub Actions CI/CD Pipeline
+## 2. Netlify Deployment (Frontend)
 
-The `.github/workflows/deploy.yml` workflow automatically runs on every push to `main` to build, typecheck, and validate the application automatically.
+- **1-Click Import Link**: [https://app.netlify.com/start](https://app.netlify.com/start)
+- **Configuration**: Managed automatically via `netlify.toml`.
+- **Build Command**: `cd frontend && npm install && npm run build`
+- **Publish Directory**: `frontend/dist`
+
+---
+
+## 3. Render Deployment (Full-Stack Backend + Database + Frontend)
+
+- **1-Click Blueprint Import**: [https://dashboard.render.com/select-repo?type=blueprint](https://dashboard.render.com/select-repo?type=blueprint)
+- **Configuration**: Managed automatically via `render.yaml`.
+- **Services Deployed**:
+  - `retrace-backend`: Node.js Express REST API (`/health` & `/api/items`)
+  - `retrace-frontend`: React Static Site
+
+---
+
+## 4. GitHub Pages
+
+- **Live URL**: [https://suriya0306.github.io/RETRACE---Smart-Campus-Lost-Found/](https://suriya0306.github.io/RETRACE---Smart-Campus-Lost-Found/)
+- **Branch**: `gh-pages`
+- **Fallback**: Includes `.nojekyll` and `404.html` for single-page app routing.
